@@ -1,4 +1,15 @@
-﻿.jdbss-dropdown {
+/*
+ * Copyright JDB-SoftSystems - 2021
+ * Material Property of JDB Soft-Systems
+ * Jacksonville, Florida
+ * 
+ * https://www.jdbss.com
+ * 
+ * For license information please see LICENSE.txt 
+ *  
+*/
+
+.jdbss-dropdown {
     height: 320px;
     width: 400px;
     overflow-y: auto;
