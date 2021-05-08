@@ -1,0 +1,64 @@
+﻿.jdbss-dropdown {
+    height: 320px;
+    width: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: solid 1px #ced4da;
+    position: absolute;
+    top: 54px;
+    background-color: #f8f8f8;
+    font-size: small;
+    z-index: 10000;
+}
+
+.jdbss-dropdown-header {
+    font-weight: bold;
+    background-color: #d1f5ad;
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+}
+.jdbss-dropdown-index{
+
+}
+.jdbss-dropdown-option-header{
+
+}
+.jdbss-dropdown-option {
+}
+
+.jdbss-dropdown-hide {
+    visibility: hidden;
+}
+
+.jdbss-dropdown-show {
+    visibility: visible;
+}
+
+.jdbss-dropdown-border-none {
+    border: none;
+}
+
+.jdbss-dropdown-border-dd-top {
+    border-top: 1px solid #ced4da !important;
+    border-right: 1px solid #ced4da !important;
+    border-radius: 0.25rem;
+}
+
+.jdbss-dropdown-border-dd-bot {
+    border-bottom: 1px solid #ced4da !important;
+    border-right: 1px solid #ced4da !important;
+    border-radius: 0.25rem;
+}
+
+.jdbss-dropdown-row:hover {
+    background-color: #c5f3f7;
+    cursor: pointer;
+}
+
+.jdbss-dropdown-selected {
+    background-color: #b7ebf8;
+}
+
+.jdbss-dropdown-input {
+    background-color: none;
+}
