@@ -1,12 +1,13 @@
-﻿// ******************************************************************************** //
-// ******************************************************************************** //
-// **                                                                            ** //
-// **                   Copyright JDB-SoftSystems - 2021                         ** //
-// **               Material Property of JDB Soft-Systems                        ** //
-// **                   Jacksonville, Florida  32256                             ** //
-// **                                                                            ** //
-// ******************************************************************************** //
-// ******************************************************************************** //
+/*
+ * Copyright JDB-SoftSystems - 2021
+ * Material Property of JDB Soft-Systems
+ * Jacksonville, Florida
+ * 
+ * https://www.jdbss.com
+ * 
+ * For license information please see LICENSE.txt 
+ *  
+*/
 ; (function ($, window, document, undefined) {
     "use strict";
 
