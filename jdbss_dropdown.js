@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright JDB-SoftSystems - 2021
  * Material Property of JDB Soft-Systems
  * Jacksonville, Florida
@@ -8,6 +8,8 @@
  * For license information please see LICENSE.txt 
  *  
 */
+
+
 ; (function ($, window, document, undefined) {
     "use strict";
 
@@ -18,19 +20,24 @@
         document = window.document,
         defaults = {
             default: "true",
-            nameprefix: "jdbss_dropdown",
-            datasource: "inline",
+            datasource: "json",
             data: "",
             indexcolumn: 0,
             valuecolumn: -1,
-            showindex: false,
+            showindex: true,
             bootstrapcol: null,
             headingclass: null,
             dataclass: null,
             headings:null,
             display: {
-                caret: "fontawesome",
-                width: "800px"
+                caret: "bootstrap",
+                virtual_width: "300px", 
+                display_width: "container"
+            },
+            accordion: {
+                showicon: false,
+                title:"",
+                id: ""
             },
             dropdownopened_callback: function () { },
             dropdownclosed_callback: function () { },
@@ -51,21 +58,26 @@
         //All variables & Local
         this.$container = null;
         this.container = element.id;
+        this.inputboxId = element.id + "-inputbox";
+        this.dropdownareaId = this.inputboxId + "-options";
+        this.dropdownIconId = this.inputboxId + "-icon";
+        this.theListId = element.id + "-theList";
 
-        this.ClassHide = "jdbss-dropdown-hide";
-        this.ClassShow = "jdbss-dropdown-show";
-        this.ClassActive = "active";
-        this.ClassSelected = "jdbss-dropdown-selected";
-        this.ClassBottom = "jdbss-dropdown-border-dd-bot";
+        this.nameprefix = "jdbss-dropdown";
+        this.ClassHide = this.nameprefix + "-hide";
+        this.ClassShow = this.nameprefix + "-show";
+        this.ClassSelected = this.nameprefix + "-selected";
+        this.ClassBottom = this.nameprefix + "-border-dd-bot";
+        this.ClassRow = this.nameprefix + "-row";
         this.ClassCaret = "dropdown-toggle";
-        this.ClassRow = "jdbss-dropdown-row";
+        this.ClassActive = "active";
         this.ClassInputGroup = "input-group-text";
         this.ClassButton = "btn";
         this.AriaExpand = "aria-expanded";
         this.AriaControls = "aria-controls";
         this.AriaIndex = "aria-index";
 
-        this.initCompleted = false;
+        this.initCompleted = false;        
         this.DATASOURCE = { INLINE: "inline", JSON: "json" };
         this.STATES = { CLOSED: "closed", EXPANDED: "expanded" }
         this.CARETS = { BOOTSTRAP: "bootstrap", FONTAWESOME: "fontawesome" }
@@ -74,7 +86,6 @@
         this.$dropdown = null;
         this.$dropdown_data = null;
         this.$dropdown_input = null;
-        this.controlId = "";
         this.data = "";
         this.Rows = "";
         this.$Rows = [];
@@ -101,25 +112,22 @@
         },
 
         __dropdown_click: function (ctrl) {
-
+            ctrl.preventDefault();
             if (this.state === this.STATES.CLOSED) {
-                //this.__size_position();
-
                 this.state = this.STATES.EXPANDED;
                 this.$dropdown_data.removeClass(this.ClassHide);
-                this.$dropdown_data.addClass(this.ClassShow);
                 this.$dropdownIcon.attr(this.AriaExpand, 'true');
+                this.__size_position();
                 this.__callback_open(ctrl);
             }
             else {
                 this.state = this.STATES.CLOSED;
-                this.$dropdown_data.removeClass(this.ClassShow);
                 this.$dropdown_data.addClass(this.ClassHide);
                 this.$dropdownIcon.attr(this.AriaExpand, 'false');
                 this.__callback_close(ctrl);
             }
+            //this.$dropdown_input.select();
         },
-
         __dropdown_selectrow_click: function (ctrl) {
             var rowid = ctrl.currentTarget.id;
             var idx = "";
@@ -146,7 +154,7 @@
             this.$dropdown_input.val(text);
             this.$dropdown_input.attr(this.AriaIndex, idx);
 
-            this.__callback_rowselected(ctrl);
+            this.__callback_rowselected(this.container, idx, ctrl);
             this.__dropdown_click(ctrl);
 
         },
@@ -154,16 +162,31 @@
         __size_position: function () {
 
             var iWidth = this.$container.width();
-            var iWidthSent = parseInt(this.settings.display.width);
+            var iWidthSent = parseInt(this.settings.display.virtual_width);
 
-            if (iWidth > iWidthSent)
-                iWidth = iWidthSent;
+            /* The container holding the dropdow is larger than 
+             * the width specified, so use the container width
+             * less the 35 to account for any scroll-bars
+            */
+            if (this.settings.display.display_width === 'container') {
+                if (iWidth > iWidthSent) {
+                    iWidthSent = iWidth - 35;
+                }
+                else {
 
-            this.$dropdown.css("width", iWidth  + 35 + "px");
-            this.$dropdown.find(".pl-2").css("width", iWidthSent + "px");
+                }
+            }
+            else {
+                iWidth = parseInt(this.settings.display.display_width);
+            }
+
+            this.$dropdown.css("width", iWidth + 35 + "px");
+            this.$dropdown.css("width", iWidth + "px");
+            this.$dropdown.find("#" + this.theListId).css("width", iWidthSent + "px");
             this.$dropdown.css("top", (this.$container.height() + this.$dropdown_input.position().top + 0) + "px");
 
         },
+
         __callback_open: function (ctrl) {
 
             if (this.initCompleted && this.settings.dropdownopened_callback !== null && this.settings.dropdownopened_callback !== undefined)
@@ -175,11 +198,12 @@
             if (this.initCompleted && this.settings.dropdownclosed_callback !== null && this.settings.dropdownclosed_callback !== undefined)
                 this.settings.dropdownclosed_callback(ctrl);
         },
-        __callback_rowselected: function (ctrl) {
+        __callback_rowselected: function (containerId, idx, ctrl) {
 
             if (this.initCompleted && this.settings.rowselected_callback !== null && this.settings.rowselected_callback !== undefined)
-                this.settings.rowselected_callback(ctrl);
+                this.settings.rowselected_callback(containerId, idx, ctrl);
         },
+
         __setupFunction: function () {
             this.__writeOutput();
             this.__wireObjects();
@@ -189,16 +213,15 @@
 
         __wireObjects: function () {
             this.$container = $("#" + this.container);
-            this.$dropdownIcon = this.$container.find('.jdbss-dropdown-icon');
-            this.controlId = this.$dropdownIcon.attr(this.AriaControls);
+            this.$dropdownIcon = this.$container.find('#' + this.dropdownIconId);
 
             if (this.settings.datasource === this.DATASOURCE.JSON) {
                 this.__buildList();
             }
 
             this.$dropdown = this.$container.find('.jdbss-dropdown');
-            this.$dropdown_input = this.$container.find('.jdbss-dropdown-input');
-            this.$dropdown_data = $('#' + this.controlId);
+            this.$dropdown_input = this.$container.find('#' + this.inputboxId);   ;
+            this.$dropdown_data = $('#' + this.dropdownareaId);
         },
 
         __wireEvents: function () {
@@ -207,6 +230,19 @@
         },
 
         __writeOutput: function () {
+
+            var $temp = $("#" + this.container);
+            var sPrePend = "<input id='" + this.inputboxId + "' class='form-control jdbss-dropdown-input' type='text' aria-index=''>" +
+                            "<div class='input-group-append'><a id='" + this.dropdownIconId + "'class='jdbss-dropdown-icon' data-dropdown='true' href='#" +
+                            this.dropdownareaId + "' role='button' aria-controls='" + this.dropdownareaId + "'></a></div>";
+
+            if (this.settings.accordion.showicon === true) {
+                sPrePend = sPrePend + "<div class='input-group-append input-group-text btn-light'><span class='collapsed' data-toggle='collapse' href='#" +
+                    this.settings.accordion.id + "' role='button' aria-expanded='false' aria-controls='" + this.settings.accordion.id + "' title='" +
+                    this.settings.accordion.title + "'><span class='fa fa-angle-double-down'></span></span></div>";
+            }
+
+            $temp.prepend(sPrePend);
 
         },
 
@@ -242,7 +278,7 @@
                 x = x + 1;
                 $this.addClass(xThis.ClassBottom);
                 $this.addClass(xThis.ClassRow);
-                $this.attr("id", "dd-row-" + xThis.controlId + "-" + x);
+                $this.attr("id", xThis.theListId + "-row-" + x);
                 if (x > 1) {
                     $this.prepend("<div class='col-1 jdbss-dropdown-option input-group-text jdbss-dropdown-border-none'><input class='m-auto' type='radio' name='r" + xThis.controlId + "' id='dd-input-" + xThis.controlId + "-" + x + "'></div>");
                 }
@@ -325,7 +361,7 @@
         __buildList: function () {
 
             var y = 0;
-            var str = "<div class='jdbss-dropdown jdbss-dropdown-hide' id='" + this.controlId + "'><div class='pl-2'" + ";'>";
+            var str = "<div class='jdbss-dropdown jdbss-dropdown-hide' id='" + this.dropdownareaId + "'><div id='" + this.theListId + "' class='pl-2'>";
                
             //==============================================================================
             // Build out the header Row

@@ -1,15 +1,4 @@
-/*
- * Copyright JDB-SoftSystems - 2021
- * Material Property of JDB Soft-Systems
- * Jacksonville, Florida
- * 
- * https://www.jdbss.com
- * 
- * For license information please see LICENSE.txt 
- *  
-*/
-
-.jdbss-dropdown {
+﻿.jdbss-dropdown {
     height: 320px;
     width: 400px;
     overflow-y: auto;
@@ -72,4 +61,5 @@
 
 .jdbss-dropdown-input {
     background-color: none;
+    font-weight:bold;
 }
